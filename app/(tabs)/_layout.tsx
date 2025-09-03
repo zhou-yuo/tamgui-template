@@ -1,43 +1,68 @@
+import { HapticTab } from '@/components/HapticTab';
+import { Compass, MessageCircle, TvMinimalPlay, UserRound, UsersRound } from '@tamagui/lucide-icons';
+
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
-
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useTheme } from 'tamagui';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+
+  const theme = useTheme();
+  console.log("🚀 ~ TabLayout ~ theme:", theme)
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: theme.accentColor.get(),
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
+        // tabBarBackground: () => (<View style={{ background: '$background' }}></View>),
+        // tabBarStyle: {
+        //   position: 'absolute',
+        // },
+        tabBarIconStyle: {
+          width: 24,
+          height: 24,
+          marginBottom: 2,
+        },
+        tabBarLabelStyle: {
+          fontSize: 10,
+          lineHeight: 12,
+        },
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: '消息',
+          tabBarIcon: ({ focused }) => <MessageCircle size={24} color={ focused ? '$accentColor' : '$color10' } />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="contact"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: '通讯录',
+          tabBarIcon: ({ focused }) => <UsersRound size={24} color={ focused ? '$accentColor' : '$color10' }/>,
+        }}
+      />
+      <Tabs.Screen
+        name="movie"
+        options={{
+          title: '视频',
+          tabBarIcon: ({ focused }) => <TvMinimalPlay size={24} color={ focused ? '$accentColor' : '$color10' } />,
+        }}
+      />
+      <Tabs.Screen
+        name="discover"
+        options={{
+          title: '发现',
+          tabBarIcon: ({ focused }) =><Compass size={24} color={ focused ? '$accentColor' : '$color10' } />,
+        }}
+      />
+      <Tabs.Screen
+        name="user"
+        options={{
+          title: '我的',
+          tabBarIcon: ({ focused }) => <UserRound size={24} color={ focused ? '$accentColor' : '$color10' } />,
         }}
       />
     </Tabs>

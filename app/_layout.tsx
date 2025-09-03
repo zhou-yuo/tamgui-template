@@ -1,29 +1,60 @@
+import { useColorScheme } from '@/hooks/useColorScheme';
+import useAuthStore from '@/stores/useAuthStore';
+import useCommonStore from '@/stores/useCommonStore';
+import tamaguiConfig from '@/tamagui.config';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { ReactElement } from 'react';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import 'react-native-reanimated';
+import { TamaguiProvider } from 'tamagui';
+import LoginScreen from './login';
+import SplashScreen from './splash';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+function RootWrapper({ children }: { children: ReactElement }) {
+  const colorScheme = useColorScheme();
+
+  return (
+    <GestureHandlerRootView>
+      <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme!}>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          {children}
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </TamaguiProvider>
+    </GestureHandlerRootView>
+  );
+}
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  const commonStore = useCommonStore();
+  const authStore = useAuthStore();
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
+  if (commonStore.isSplash) {
+    return (
+      <RootWrapper>
+        <SplashScreen />
+      </RootWrapper>
+    );
+  }
+
+  if (!authStore.isLogin) {
+    return (
+      <RootWrapper>
+        <LoginScreen />
+      </RootWrapper>
+    );
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <RootWrapper>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    </RootWrapper>
   );
 }
